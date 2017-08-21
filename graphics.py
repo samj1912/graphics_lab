@@ -2,6 +2,8 @@
 import argparse
 import turtle
 
+MAIN = 0
+
 
 def draw_sym(pen, x, y, color="black"):
     pen.setpos(x, y)
@@ -13,15 +15,20 @@ def draw_sym(pen, x, y, color="black"):
 def draw_curve(pen, length, denominator):
     x = 0.0
     y = 0.0
+
     draw_sym(pen, x, y)
-    critical_point = int((denominator / 3) ** 0.5)
-    while x < critical_point and x <= length:
+
+    critical_point = (denominator / 3) ** 0.5
+
+    while x < critical_point and x < length:
         x += 1
         if y + 0.5 - ((x**3) / denominator) < 0:
             y += 1
         draw_sym(pen, x, y)
-    while x <= length:
+
+    while x < length:
         y += 1
+        print(y - ((x + 0.5)**3) / denominator)
         if y - ((x + 0.5)**3) / denominator > 0:
             x += 1
         draw_sym(pen, x, y)
@@ -30,36 +37,31 @@ def draw_curve(pen, length, denominator):
 def draw_curve_incremental(pen, length, denominator):
     x = 0.0
     y = 0.0
+
     draw_sym(pen, x, y)
 
-    critical_point = int((denominator / 3) ** 0.5)
+    critical_point = (denominator / 3) ** 0.5
 
-    prev_x_cubed = x**3
-    next_x_cubed = (x + 1)**3
-    decision_paremeter = y + 0.5 - next_x_cubed / denominator
+    decision_paremeter = y + 0.5 - (x + 1)**3 / denominator
 
-    while x < critical_point and x <= length:
-        prev_x_cubed = next_x_cubed
-        next_x_cubed = prev_x_cubed + 3 * (x**2 + x) + 1
+    while x < critical_point and x < length:
         x += 1
         if decision_paremeter < 0:
-            y += 1
             decision_paremeter += 1
-        decision_paremeter += (prev_x_cubed - next_x_cubed) / denominator
+            y += 1
+        decision_paremeter -= (3 * (x**2 + x) + 1) / denominator
         draw_sym(pen, x, y, "red")
 
-    next_x_cubed = (x + 0.5)**3
-    decision_paremeter = y + 1 - next_x_cubed / denominator
+    x += 0.5
+    decision_paremeter = y + 1 - (x**3 / denominator)
 
-    while x <= length:
+    while x < length:
         y += 1
         if decision_paremeter > 0:
+            decision_paremeter -= (3 * (x**2 + x) + 1) / denominator
             x += 1
-            prev_x_cubed = next_x_cubed
-            next_x_cubed = prev_x_cubed + 3 * (x**2 + x) + 1
-            decision_paremeter += (prev_x_cubed - next_x_cubed) / denominator
         decision_paremeter += 1
-        draw_sym(pen, x, y, "red")
+        draw_sym(pen, x - 0.5, y, "red")
 
 
 def main():
